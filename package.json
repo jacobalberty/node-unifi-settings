@@ -1,0 +1,19 @@
+{
+  "name": "node-unifi-settings",
+  "version": "1.0.0",
+  "description": "A set of helper objects to go along with node-unifi for managing device settings.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jacobalberty/node-unifi-settings.git"
+  },
+  "author": "Jacob Alberty",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jacobalberty/node-unifi-settings/issues"
+  },
+  "homepage": "https://github.com/jacobalberty/node-unifi-settings#readme"
+}
