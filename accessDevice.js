@@ -1,30 +1,27 @@
+'use strict';
 
-var accessDevice = function(device) {
-    this._poemodes = ['off', 'passv24', 'auto'];
-    this._dirty = [ ];
 
-    this.constructor = function(device) {
+class accessDevice {
+    constructor(device) {
+        this._poemodes = ['off', 'passv24', 'auto'];
+        this._dirty = [ ];
+
         this._device = this._dropArray(device);
         if (!this.validate())
             throw `validation failed`;
-    };
+    }
 
-    this.getChanges = function() {
+    getChanges() {
         var result = { };
-        for (key in this._dirty) {
+
+        for (var key in this._dirty) {
             var value = this._dirty[key]
             result[value] = this._device[value];
         }
         return result;
     }
 
-    this._markDirty = function(field) {
-        if (this._dirty.indexOf(field) === -1) {
-            this._dirty.push(field);
-        }
-    };
-
-    this.setPoe = function(port, mode) {
+    setPoe(port, mode) {
         var port_overrides = this._device.port_overrides;
         var port_table = this._device.port_table;
         if (this._poemodes.indexOf(mode) === -1) {
@@ -53,9 +50,9 @@ var accessDevice = function(device) {
                 poe_mode: mode
             }
         );
-    };
+    }
 
-    this.validate = function() {
+    validate() {
         if (this._device === Object(this._device)) {
             if (this._device.type === "usw") {
                 return true;
@@ -64,16 +61,21 @@ var accessDevice = function(device) {
         return false;
     }
 
-    this._dropArray = function(obj) {
+    _dropArray(obj) {
         // We only ever expect to receive our device within an array containing just our object or another nested array
         // So let's just strip off the arrays to get the object
         if (Array.isArray(obj))
             return this._dropArray(obj[0]);
         else
             return obj;
-    };
+    }
 
-    this.constructor(device);
+    _markDirty(field) {
+        if (this._dirty.indexOf(field) === -1) {
+            this._dirty.push(field);
+        }
+    }
+
 }
 
 module.exports = accessDevice;
