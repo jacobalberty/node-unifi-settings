@@ -24,6 +24,7 @@ class accessDevice {
     }
 
     setPoe(port, mode) {
+        port = parseInt(port);
         var port_overrides = this._device.port_overrides;
         var port_table = this._device.port_table;
         if (this._poemodes.indexOf(mode) === -1) {
