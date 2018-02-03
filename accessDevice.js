@@ -7,6 +7,8 @@ class accessDevice {
         this._dirty = [ ];
 
         this._device = this._dropArray(device);
+        this.id = this._device._id;
+
         if (!this.validate())
             throw `validation failed`;
     }
