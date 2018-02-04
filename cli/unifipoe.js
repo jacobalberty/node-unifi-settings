@@ -36,7 +36,11 @@ function updateAccessDevice(controller, sites, accessDevice) {
 }
 
 controller.login(config.username, config.password, function(error) {
+    if (error)
+        throw error;
     controller.getAccessDevices('default', function(error, data) {
+        if (error)
+            throw error;
         var ad = new accessDevice(data);
         ad.setPoe(port, mode);
 
