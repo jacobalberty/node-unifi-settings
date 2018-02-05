@@ -15,13 +15,6 @@ class accessDevice {
     }
 
     getChanges() {
-        // Pull any non existant port_overrides back from usedPorts
-        for (key in this._usedPorts) {
-            var port = this._usedPorts[key];
-
-            if (this._device.port_overrides.indexOf(port.overrides) === -1)
-                this._device.port_overrides.push(port.overrides);
-        }
         var result = { };
 
         for (var key in this._dirty) {
@@ -92,6 +85,8 @@ class Port {
                 port_idx: data.table.port_idx,
                 portconf_id: data.table.portconf_id
             }
+            if (parent._device.port_overrides.indexOf(data.overrides) === -1)
+                parent._device.port_overrides.push(data.overrides);
         }
         this._data = data;
     }
