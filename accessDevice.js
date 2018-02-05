@@ -57,12 +57,6 @@ class accessDevice {
         return tmp;
     }
 
-    setPoe(port, mode) {
-        port = this.ports(port);
-
-        port.poe_mode = mode;
-    }
-
     validate() {
         if (this._device === Object(this._device)) {
             if (this._device.type === "usw") {

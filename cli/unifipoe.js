@@ -42,7 +42,8 @@ controller.login(config.username, config.password, function(error) {
         if (error)
             throw error;
         var ad = new accessDevice(data);
-        ad.setPoe(port, mode);
+        var portObj = ad.ports(port)
+        portObj.poe_mode = mode;
 
         updateAccessDevice(controller, config.site, ad);
     }, mac);
