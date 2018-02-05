@@ -1,5 +1,5 @@
 var accessDevice = require('./accessDevice');
 
-exports = {
+module.exports = {
     accessDevice: accessDevice
 };
