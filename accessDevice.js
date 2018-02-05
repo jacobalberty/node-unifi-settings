@@ -1,7 +1,6 @@
 'use strict';
 
-
-class accessDevice {
+module.exports = class accessDevice {
     constructor(device) {
         this._poemodes = ['off', 'passv24', 'auto'];
         this._dirty = [ ];
@@ -114,6 +113,3 @@ class Port {
         return this._data.table;
     }
 }
-
-
-module.exports = accessDevice;
