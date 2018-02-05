@@ -5,6 +5,7 @@ class accessDevice {
     constructor(device) {
         this._poemodes = ['off', 'passv24', 'auto'];
         this._dirty = [ ];
+        this._usedPorts = { };
 
         this._device = this._dropArray(device);
         this.id = this._device._id;
@@ -14,6 +15,13 @@ class accessDevice {
     }
 
     getChanges() {
+        // Pull any non existant port_overrides back from usedPorts
+        for (key in this._usedPorts) {
+            var port = this._usedPorts[key];
+
+            if (this._device.port_overrides.indexOf(port.overrides) === -1)
+                this._device.port_overrides.push(port.overrides);
+        }
         var result = { };
 
         for (var key in this._dirty) {
@@ -23,36 +31,36 @@ class accessDevice {
         return result;
     }
 
-    setPoe(port, mode) {
+    ports(port) {
         port = parseInt(port);
-        var port_overrides = this._device.port_overrides;
-        var port_table = this._device.port_table;
-        if (this._poemodes.indexOf(mode) === -1) {
-            throw `${mode} is not a valid POE mode`;
+
+        if (this._usedPorts[port] !== undefined) {
+            return this._usedPorts[port];
         }
+
         if (!(port-1 in this._device.port_table)) {
             throw `port '${port}' does not exist on this switch`;
         }
-        if (this._device.port_table[port-1].port_poe === false) {
-            throw `port '${port}' does not support poe`;
-        }
 
-        this._markDirty('port_overrides');
+        var finder = function(element) {
+            return element.port_idx === port;
+        };
 
-        for (var key in port_overrides) {
-            if (port_overrides[key].port_idx === port) {
-                this._device.port_overrides[key].poe_mode = mode
-                return;
-            }
-        }
-        // Port override must not exist yet, let's go ahead and make one.
-        this._device.port_overrides.push(
-            {
-                port_idx: port,
-                portconf_id: port_table[port-1].portconf_id,
-                poe_mode: mode
-            }
-        );
+        var device = this._device;
+
+        var tmp = new Port(this, {
+            overrides: device.port_overrides.find(finder),
+            table: device.port_table.find(finder)
+        });
+        this._usedPorts[port] = tmp;
+
+        return tmp;
+    }
+
+    setPoe(port, mode) {
+        port = this.ports(port);
+
+        port.poe_mode = mode;
     }
 
     validate() {
@@ -80,5 +88,43 @@ class accessDevice {
     }
 
 }
+
+class Port {
+    constructor(parent, data) {
+        this.parent = parent;
+        this._poemodes = ['off', 'passv24', 'auto'];
+        if (data.overrides === undefined) {
+            data.overrides = {
+                port_idx: data.table.port_idx,
+                portconf_id: data.table.portconf_id
+            }
+        }
+        this._data = data;
+    }
+    set poe_mode(mode) {
+        if (this._poemodes.indexOf(mode) === -1) {
+            throw `${mode} is not a valid POE mode`;
+        }
+
+        if (this._data.table.port_poe === false) {
+            throw `port '${this._data.table.port_idx}' does not support poe`;
+        }
+
+        if (this.overrides.poe_mode !== mode) {
+            this.parent._markDirty('port_overrides');
+            this.overrides.poe_mode = mode;
+        }
+    }
+    get poe_mode() {
+        return this._data.table.poe_mode;
+    }
+    get overrides() {
+        return this._data.overrides;
+    }
+    get table() {
+        return this._data.table;
+    }
+}
+
 
 module.exports = accessDevice;
