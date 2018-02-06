@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/jacobalberty/node-unifi-settings/issues"
   },
-  "homepage": "https://github.com/jacobalberty/node-unifi-settings#readme"
+  "homepage": "https://github.com/jacobalberty/node-unifi-settings#readme",
+  "dependencies": {
+    "bytes": "^3.0.0",
+    "pretty-ms": "^3.1.0"
+  }
 }

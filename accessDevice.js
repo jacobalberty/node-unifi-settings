@@ -1,16 +1,28 @@
 'use strict';
+const bytes = require('bytes')
+    , prettyMs = require('pretty-ms');
 
 module.exports = class accessDevice {
     constructor(device) {
         this._poemodes = ['off', 'passv24', 'auto'];
+        this._deviceTypes = ['uap', 'ugw', 'usw']
         this._dirty = [ ];
         this._usedPorts = { };
 
         this._device = this._dropArray(device);
-        this.id = this._device._id;
 
         if (!this.validate())
             throw `validation failed`;
+
+        this.id = this._device._id;
+        this.type = this._device.type;
+        this.name = this._device.name;
+        this.ip = this._device.ip;
+        this.mac = this._device.mac;
+        this.model = this._device.model;
+        this.version = this._device.version;
+
+        this.human = true;
     }
 
     getChanges() {
@@ -51,7 +63,7 @@ module.exports = class accessDevice {
 
     validate() {
         if (this._device === Object(this._device)) {
-            if (this._device.type === "usw") {
+            if (this._deviceTypes.indexOf(this._device.type) !== -1) {
                 return true;
             }
         }
@@ -73,6 +85,30 @@ module.exports = class accessDevice {
         }
     }
 
+    get uptime() { return this.human ? prettyMs(this._device.uptime*1000) : this._device.uptime; }
+
+    get rxstat() { return this.human ? bytes(this._device.rx_bytes) : this._device.rx_bytes }
+
+    get txstat() { return this.human ? bytes(this._device.tx_bytes) : this._device.tx_bytes }
+
+    get channel() {
+        var output = [ ];
+        var dev = this._device
+        if (dev.radio_table_stats) {
+            // Controller 5.7.x
+            for(key in dev.radio_table_stats) {
+                var radio = dev.radio_table_stats[key];
+                output.push(`${radio.channel} (${radio.radio})`);
+            }
+        } else {
+            // Works with controller 5.6.x
+            if (dev['ng-channel'])
+                output.push(`${dev['ng-channel']} (2.4ghz)`);
+            if (dev['na-channel'])
+                output.push(`${dev['na-channel']} (5ghz)`);
+        }
+        return output.join(', ');
+    }
 }
 
 class Port {
