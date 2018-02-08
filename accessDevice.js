@@ -38,6 +38,10 @@ module.exports = class accessDevice {
     ports(port) {
         port = parseInt(port);
 
+        if (this._device.type !== 'usw') {
+            throw `Only UniFi switches support port changes right now`;
+        }
+
         if (this._usedPorts[port] !== undefined) {
             return this._usedPorts[port];
         }
