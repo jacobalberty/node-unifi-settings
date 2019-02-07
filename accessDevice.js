@@ -4,7 +4,7 @@ const bytes = require('bytes')
 
 module.exports = class accessDevice {
     constructor(device) {
-        this._poemodes = ['off', 'passv24', 'auto'];
+        this._poemodes = ['off', 'pasv24', 'auto'];
         this._deviceTypes = ['uap', 'ugw', 'usw']
         this._dirty = [ ];
         this._usedPorts = { };
@@ -118,7 +118,7 @@ module.exports = class accessDevice {
 class Port {
     constructor(parent, data) {
         this.parent = parent;
-        this._poemodes = ['off', 'passv24', 'auto'];
+        this._poemodes = ['off', 'passv24', 'pasv24', 'auto'];
         if (data.overrides === undefined) {
             data.overrides = {
                 port_idx: data.table.port_idx,
@@ -132,6 +132,9 @@ class Port {
     set poe_mode(mode) {
         if (this._poemodes.indexOf(mode) === -1) {
             throw `${mode} is not a valid POE mode`;
+        }
+        if (mode == 'passv24') {
+            mode = 'pasv24';
         }
 
         if (this._data.table.port_poe === false) {
